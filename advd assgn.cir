@@ -1,0 +1,108 @@
+*** DIFF AMPLIFIER EARLIER CIRCUIT ***
+
+.lib tsmc018.lib
+
+.param W=3300n
+.param x1=1.8
+.param x2=1.1
+.param x3=1.5
+.param x4=0.498495
+.param m=350
+.param n=100
+.param v=0
+.param l=350n
+.param w1=m*l
+.param w2=n*l
+.param k=200
+.param w3=k*l
+.param C1=.02f
+.param C2=2.2p
+.param R2=0.9k
+.param R1=1k
+.param Rc=10
+.param l1 = 350n
+vdd 1 0 2.5
+*idc 2 0 dc 10u
+*idc2 1 14 dc 10u
+*v1 14 0 {x1}
+*v2 15 0 {x2}
+*v3 16 0 {x3}
+*v4 4 0 {x4}
+*v5 24 0 {x1}
+*v6 22 0 {x2}
+*v7 20 0 {x3}
+
+*m8 2 2 1 1 cmosp l=l1 w=350n
+*Rb1 2 70
+*v8 2 0 1.4402378
+
+*Inputs
+vin2 11 0 0
+*ac sine({V} 1m 1k 0 0 180)
+vin1 10 0 ac sine({V} 1m 1k)
+
+*Output nodes 23,12
+
+*Diff amp
+m5 3 72 1 1 cmosp l=l1 w=1750n
+m1 26 10 3 1 cmosp l=l1 w=w1
+m2 5 11 3 1 cmosp l=l1 w=w1
+m3 26 4 0 0 cmosn l=l1 w=w2
+m4 5 4 0 0 cmosn l=l1 w=w2
+
+*cascode-1
+m6 13 73 1 1 cmosp l=l1 w=W
+m7 6 5 0 0 cmosn l=l1 w=w3
+m9 12 70 6 0 cmosn l=l1 w=2000n
+m10 12 74 13 1 cmosp l=l1 w=W
+*m11 14 14 0 0 cmosn l=350n w=350n
+
+*cascode-2
+m15 21 73 1 1 cmosp l=l1 w=W
+m14 23 74 21 1 cmosp l=l1 w=W
+m13 23 70 25 0 cmosn l=l1 w=2000n
+m12 25 26 0 0 cmosn l=l1 w=w3
+
+*Load and compensation capascitances, Resistances added to adjust phase margin
+Cc 5 60 {C1}
+Rc1 60 6 {R1}
+
+Cload 12 50 {C2}
+Rl1 50 0 {R2}
+
+Cc2 25 61 {C1}
+Rc2 61 26 {R1}
+
+Cload2 23 51 {C2}
+Rl2 51 0 {R2}
+
+
+*Biasing
+
+m16 70 70 1 1 cmosp l=l1 w=350n
+idc 70 0 dc 1.5986u
+
+m17 1 1 73 0 cmosn l=l1 w =1920n
+m18 0 0 73 1 cmosp l=l1 w =350n
+
+m19 1 1 72 0 cmosn l=l1 w =877n
+m20 0 0 72 1 cmosp l=l1 w =350n
+
+m21 74 74 1 1 cmosp l=l1 w =573n
+m22 74 74 0 0 cmosn l=l1 w =350n
+
+Rb1 1 4 20k
+Rb2 4 0 4.9812k
+
+
+*.step param W 3500n 1500n 10n
+*.step param m 300 600 10
+*.step param k 100 300 5
+*.step param x1 1.5 2 0.05
+*.step param x2 0.1 1.8 0.2
+*.step param x3 0.1 1.8 0.2
+*.op
+*.step param R 20k 10k 1k
+.ac dec 10 1 100k
+*.tran 1m
+*.dc v1 0.1 1.8 0.1
